@@ -1,0 +1,40 @@
+# --- local runtime data: never published -------------------------------------
+state/
+src/state/
+reports/
+work/
+archive-demo/
+*.gbvault
+*.keys.json
+token.txt
+*.lnk
+
+# one-off local probes; they assume a specific machine and account
+scripts/diagnostics/
+
+# reference & research material (kept locally only)
+refs/
+upstream/
+dist/
+
+# local secrets
+.env
+.env.*
+*.pem
+*.key
+
+# --- Python ------------------------------------------------------------------
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- editors / OS ------------------------------------------------------------
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a decoding, CLI, HTTP or MCP problem
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Do not paste real chat content, contact lists,
+        QR codes, `keys.json`, or snapshots.** Redact message text.
+  - type: input
+    id: version
+    attributes:
+      label: Version / build
+      description: Output of `greenbubbles.cmd source status` (或 `pip show greenbubbles-win`)
+      placeholder: 0.2.1
+    validations:
+      required: true
+  - type: input
+    id: wechat
+    attributes:
+      label: WeChat version
+      placeholder: 4.1.11.24
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where does it fail?
+      options:
+        - CLI
+        - HTTP connector
+        - MCP server
+        - Archive export
+        - Snapshot
+        - Key capture / decryption
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or request
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened
+      description: Envelope, error text or exit code. Remove message content.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true

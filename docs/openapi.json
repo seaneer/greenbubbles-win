@@ -1,0 +1,296 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "greenbubbles-win Connector",
+    "version": "0.2.1",
+    "description": "Read-only local access to WeChat 4.x messages on Windows. All endpoints except /health require a bearer token from state/token.txt. Responses use the greenbubbles.query.v1 envelope; /api/v1/media returns raw bytes."
+  },
+  "servers": [
+    { "url": "http://127.0.0.1:8787", "description": "local connector" }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer" },
+      "headerToken": { "type": "apiKey", "in": "header", "name": "X-Greenbubbles-Token" }
+    },
+    "schemas": {
+      "Page": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "integer", "maximum": 500 },
+          "returned": { "type": "integer" },
+          "hasMore": { "type": "boolean" },
+          "nextCursor": { "type": "string", "nullable": true }
+        }
+      },
+      "Consistency": {
+        "type": "object",
+        "properties": {
+          "guarantee": { "type": "string", "example": "perDatabaseReadStatement" },
+          "databaseCount": { "type": "integer" },
+          "crossDatabaseAtomic": { "type": "boolean" },
+          "coverageComplete": { "type": "boolean" },
+          "observedAtUnixMilliseconds": { "type": "integer" }
+        }
+      },
+      "Warning": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "example": "conversationNotFound" },
+          "message": { "type": "string" }
+        }
+      },
+      "Envelope": {
+        "type": "object",
+        "required": ["schema", "operation", "ok", "items"],
+        "properties": {
+          "schema": { "type": "string", "example": "greenbubbles.query.v1" },
+          "formatVersion": { "type": "integer", "example": 1 },
+          "operation": { "type": "string", "example": "messages.list" },
+          "ok": { "type": "boolean" },
+          "source": {
+            "type": "object",
+            "properties": {
+              "mode": { "type": "string", "example": "live" },
+              "identity": { "type": "string", "example": "acct_<hash>" }
+            }
+          },
+          "consistency": { "$ref": "#/components/schemas/Consistency" },
+          "page": { "$ref": "#/components/schemas/Page" },
+          "warnings": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Warning" }
+          },
+          "items": { "type": "array", "items": { "type": "object", "additionalProperties": true } }
+        }
+      },
+      "Chat": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "12345678901@chatroom" },
+          "displayName": { "type": "string", "nullable": true },
+          "summary": { "type": "string", "nullable": true },
+          "summaryTruncated": { "type": "boolean" },
+          "sortTimestamp": { "type": "integer" },
+          "sortTime": { "type": "string", "format": "date-time" },
+          "lastMessageType": { "type": "integer" },
+          "lastMessageSender": { "type": "string" },
+          "lastSenderDisplayName": { "type": "string" }
+        }
+      },
+      "MediaInfo": {
+        "type": "object",
+        "properties": {
+          "kind": { "type": "string", "example": "image" },
+          "available": { "type": "boolean" },
+          "fileName": { "type": "string" },
+          "extension": { "type": "string", "example": "png" },
+          "size": { "type": "integer" },
+          "note": { "type": "string", "nullable": true }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "opaque cursor id, pass back verbatim" },
+          "conversationId": { "type": "string" },
+          "sortSequence": { "type": "integer" },
+          "serverId": { "type": "integer" },
+          "messageType": { "type": "integer", "description": "1 text 3 image 34 voice 43 video 47 emoji 48 location 49 app 10000 system 10002 revoke" },
+          "messageTypeLabel": { "type": "string" },
+          "messageSubtype": { "type": "integer" },
+          "messageSubtypeLabel": { "type": "string" },
+          "sender": { "type": "string" },
+          "senderDisplayName": { "type": "string", "nullable": true },
+          "isSelf": { "type": "boolean" },
+          "createdAtUnix": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "status": { "type": "integer" },
+          "content": { "type": "object", "additionalProperties": true },
+          "text": { "type": "string", "maxLength": 16000 },
+          "contentDecodeState": { "type": "string", "example": "complete" },
+          "contentTruncated": { "type": "boolean" },
+          "shard": { "type": "string", "example": "message/message_0.db" },
+          "messageLocalId": { "type": "integer" },
+          "media": { "$ref": "#/components/schemas/MediaInfo" }
+        }
+      },
+      "SearchHit": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "conversationId": { "type": "string" },
+          "conversationDisplayName": { "type": "string" },
+          "sender": { "type": "string" },
+          "senderDisplayName": { "type": "string", "nullable": true },
+          "createdAtUnix": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "sortSequence": { "type": "integer" },
+          "messageLocalId": { "type": "integer" },
+          "messageType": { "type": "integer" },
+          "messageTypeLabel": { "type": "string" },
+          "messageSubtype": { "type": "integer" },
+          "messageSubtypeLabel": { "type": "string" },
+          "snippet": { "type": "string" },
+          "media": { "$ref": "#/components/schemas/MediaInfo" }
+        }
+      },
+      "Contact": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "displayName": { "type": "string" },
+          "kind": { "type": "string", "enum": ["person", "group", "official", "service", "accountHolder"] },
+          "isAccountHolder": { "type": "boolean" },
+          "remark": { "type": "string", "nullable": true },
+          "nickname": { "type": "string", "nullable": true },
+          "alias": { "type": "string", "nullable": true }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean", "example": false },
+          "error": { "type": "string" },
+          "routes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "security": [],
+        "summary": "Liveness probe (no auth)",
+        "responses": {
+          "200": {
+            "description": "service info",
+            "content": { "application/json": { "schema": { "type": "object", "additionalProperties": true } } }
+          }
+        }
+      }
+    },
+    "/guide": {
+      "get": {
+        "summary": "Agent onboarding prompt (Markdown, auth required)",
+        "responses": {
+          "200": {
+            "description": "docs/AGENT-PROMPT.md content",
+            "content": { "text/markdown": { "schema": { "type": "string" } } }
+          },
+          "401": { "description": "missing or wrong token" },
+          "404": { "description": "guide file is not installed" }
+        }
+      }
+    },
+    "/api/v1/source": {
+      "get": {
+        "summary": "Account, key count and readiness",
+        "responses": {
+          "200": { "description": "status envelope", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "401": { "description": "missing or wrong token", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/chats": {
+      "get": {
+        "summary": "List or search conversations",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 100, "maximum": 500 } },
+          { "name": "cursor", "in": "query", "schema": { "type": "string" } },
+          { "name": "q", "in": "query", "description": "fuzzy name / remark / nickname / wxid", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "chats envelope with Chat items", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "401": { "description": "unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/messages": {
+      "get": {
+        "summary": "Messages of one conversation, newest first",
+        "parameters": [
+          { "name": "conversation", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "since", "in": "query", "schema": { "type": "string" }, "description": "ISO time, YYYY-MM-DD, or unix seconds" },
+          { "name": "until", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 100, "maximum": 500 } },
+          { "name": "cursor", "in": "query", "schema": { "type": "string" } },
+          { "name": "media", "in": "query", "schema": { "type": "boolean" }, "description": "include media metadata" }
+        ],
+        "responses": {
+          "200": { "description": "messages envelope with Message items", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "400": { "description": "conversation missing or bad time", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/search": {
+      "get": {
+        "summary": "Substring search over decoded message text (scope to one conversation!)",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "conversation", "in": "query", "schema": { "type": "string" } },
+          { "name": "since", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 100, "maximum": 500 } },
+          { "name": "media", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "index", "in": "query", "schema": { "type": "boolean", "default": true }, "description": "unscoped searches use the local text index; index=0 forces a live scan" }
+        ],
+        "responses": {
+          "200": { "description": "search envelope with SearchHit items", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "401": { "description": "unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/contacts": {
+      "get": {
+        "summary": "List contacts",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 100, "maximum": 500 } },
+          { "name": "details", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "kind", "in": "query", "schema": { "type": "string", "enum": ["person", "group", "official", "service", "accountHolder"] } }
+        ],
+        "responses": {
+          "200": { "description": "contacts envelope with Contact items", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "401": { "description": "unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/message": {
+      "get": {
+        "summary": "Fetch one message by cursor id or numeric local id",
+        "parameters": [
+          { "name": "conversation", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "envelope with 0 or 1 Message", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Envelope" } } } },
+          "401": { "description": "unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/v1/media": {
+      "get": {
+        "summary": "Raw attachment bytes for a message",
+        "parameters": [
+          { "name": "conversation", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "binary attachment",
+            "content": {
+              "image/png": { "schema": { "type": "string", "format": "binary" } },
+              "image/jpeg": { "schema": { "type": "string", "format": "binary" } },
+              "video/mp4": { "schema": { "type": "string", "format": "binary" } },
+              "application/pdf": { "schema": { "type": "string", "format": "binary" } },
+              "application/octet-stream": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "404": { "description": "no attachment on disk", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  }
+}

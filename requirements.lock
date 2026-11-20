@@ -1,0 +1,13 @@
+# Exact versions used for the 0.2.1 release build.
+# Generated on Windows x64 with CPython 3.12.  `requirements.txt` keeps the
+# supported ranges for normal installs; this file is for reproducible builds.
+# pycparser stays on 2.23 because 3.x requires Python >= 3.11 and the CI matrix
+# still covers 3.10.
+argon2-cffi==25.1.0
+argon2-cffi-bindings==26.2.0
+cffi==2.1.1
+cryptography==50.0.2
+mnemonic==0.21
+pycparser==2.23
+pycryptodome==4.5.0
+zstandard==0.25.0

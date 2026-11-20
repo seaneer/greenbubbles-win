@@ -1,0 +1,41 @@
+name: Release build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    name: Build release artifact
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock
+          python -m pip install -e .
+
+      - name: Unit tests
+        run: python -m unittest tests.test_units -v
+
+      - name: Build portable ZIP
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-portable.ps1 -PythonExe python
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: greenbubbles-win-${{ github.ref_name }}
+          path: |
+            dist/*-portable.zip
+            dist/*-portable.zip.sha256
+          if-no-files-found: error
