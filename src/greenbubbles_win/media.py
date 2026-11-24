@@ -351,6 +351,9 @@ def read_uin(account_root: Path) -> str | None:
         ilink = Path(appdata) / "Tencent" / "xwechat" / "ilink"
         if ilink.is_dir():
             candidates.extend(sorted(ilink.glob("*/kvcomm/config.ini")))
+        radium = Path(appdata) / "Tencent" / "xwechat" / "radium" / "ilink"
+        if radium.is_dir():
+            candidates.extend(sorted(radium.glob("*/kvcomm/config.ini")))
     candidates.append(account_root / "app_data" / "radium" / "ilink" / "kvcomm" / "config.ini")
 
     for path in candidates:

@@ -15,6 +15,7 @@
   <a href="#常用命令">常用命令</a> ·
   <a href="#给-agent-用">给 Agent 用</a> ·
   <a href="#归档与加密快照">归档</a> ·
+  <a href="https://github.com/bojieli/greenbubbles">上游项目</a> ·
   <a href="docs/README.md">文档</a> ·
   <a href="docs/ARCHITECTURE.md">架构</a> ·
   <a href="#贡献者">贡献者</a> ·
@@ -32,7 +33,16 @@
   <img src="https://img.shields.io/badge/status-beta-f59e0b" alt="Status: beta">
 </p>
 
-![微信本地数据 → GreenBubbles 只读查询层 → 你的 Agent，另有可选加密快照](assets/architecture.zh-CN.png)
+```mermaid
+flowchart LR
+  W["微信 4.x<br/>本机加密数据"] -->|只读查询| G["GreenBubbles for Windows<br/>CLI · HTTP · MCP"]
+  G --> A["你的 Agent<br/>搜索 / 总结 / 归档"]
+  G -.->|可选| S["加密快照<br/>24 词助记词"]
+```
+
+<sub>架构图由 Markdown（Mermaid）直接渲染，不依赖图床或 CDN。静态备份：[assets/architecture.zh-CN.png](assets/architecture.zh-CN.png)；设计说明：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。</sub>
+
+> **上游参考项目：** [Bojie Li 的 macOS 版 GreenBubbles](https://github.com/bojieli/greenbubbles)（MIT）。本项目是独立的 Windows 实现，不是上游的 fork，也不是 Windows 分支。
 
 ## English
 
@@ -410,10 +420,11 @@ curl -H "Authorization: Bearer $(cat ~/.greenbubbles-token)" \
 | 贡献者 | 角色 |
 | --- | --- |
 | [seaneer](https://github.com/seaneer) | Windows 实现、CLI/HTTP/MCP、文档与发布 |
-| [豆包工作](https://www.doubao.com) | 参与实现、测试与文档的 AI 结对编程支持 |
+| [豆包工作 / Doubao Work（官方）](https://www.doubao.com) | 参与实现、测试与文档的 AI 结对编程支持 |
 | [Bojie Li](https://github.com/bojieli/greenbubbles) | 上游 macOS GreenBubbles 作者 |
 
-上游仓库的 Git 历史还包含 `claude` 和 `github-actions[bot]`，它们是上游自动化与协作记录，不属于本 Windows 实现。
+本表是项目的正式贡献者名单。GitHub 自动生成的 Contributors 面板还可能显示
+`claude`、`github-actions[bot]` 等上游自动化账号；它们属于上游项目，不是本 Windows 实现的贡献者。
 
 ## 致谢与许可
 

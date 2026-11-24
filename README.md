@@ -15,6 +15,7 @@
   <a href="#usage">CLI usage</a> ·
   <a href="#agent-access">Agent access</a> ·
   <a href="#archive-and-snapshot">Archive</a> ·
+  <a href="https://github.com/bojieli/greenbubbles">Upstream</a> ·
   <a href="#contributors">Contributors</a> ·
   <a href="docs/README.md">Docs</a> ·
   <a href="README.zh-CN.md">中文</a> ·
@@ -31,7 +32,16 @@
   <img src="https://img.shields.io/badge/status-beta-f59e0b" alt="Status: beta">
 </p>
 
-![Architecture: WeChat local data goes through the GreenBubbles read-only query layer to your agent; an optional encrypted snapshot can be restored without WeChat](assets/architecture.png)
+```mermaid
+flowchart LR
+  W["WeChat 4.x<br/>encrypted data on this PC"] -->|read-only query| G["GreenBubbles for Windows<br/>CLI · HTTP · MCP"]
+  G --> A["Your agent<br/>search / summarize / archive"]
+  G -.->|optional| S["Encrypted snapshot<br/>24-word recovery phrase"]
+```
+
+<sub>Architecture is rendered from Markdown (Mermaid), so it does not depend on an image CDN. Static fallback: [assets/architecture.png](assets/architecture.png); design notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).</sub>
+
+> **Upstream reference:** [GreenBubbles for macOS by Bojie Li](https://github.com/bojieli/greenbubbles) (MIT). This repository is an independent Windows implementation, not a fork or a Windows branch of upstream.
 
 GreenBubbles for Windows is an independent Windows implementation of the macOS
 project [GreenBubbles](https://github.com/bojieli/greenbubbles) by Bojie Li. It
@@ -344,11 +354,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 | Contributor | Role |
 | --- | --- |
 | [seaneer](https://github.com/seaneer) | Windows implementation, CLI/HTTP/MCP, docs and releases |
-| [豆包工作](https://www.doubao.com) | AI pair-programming for implementation, tests and documentation |
+| [豆包工作 / Doubao Work (official)](https://www.doubao.com) | AI pair-programming for implementation, tests and documentation |
 | [Bojie Li](https://github.com/bojieli/greenbubbles) | Author of the upstream macOS GreenBubbles |
 
-The upstream project's Git history also credits `claude` and
-`github-actions[bot]`; those entries belong to upstream automation, not this
+This table is the canonical contributor list. GitHub's automatically generated
+contributors panel may also show upstream automation accounts such as `claude`
+and `github-actions[bot]`; those belong to the upstream project, not to this
 Windows implementation.
 
 ## Roadmap
